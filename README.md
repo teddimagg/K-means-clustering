@@ -2,6 +2,14 @@
 ## Implementation
 Implementation of the k-means clustering class
 
+The algorithm was implemented as a javascript class, class K(X, K, Niters). The class is constructed with three variables, X is the two dimensional data matrix that is to be classified. The K variable represents the number of prototypes (classes) to classify and finally the Niter wich in our case automatically runs Niter number of steps of the algorithm when constructed.
+
+For demonstrational purposes the steps are intervaled on one second each step so that the progress can be seen live. The following link is to a live version of the whole project, with three datasets and manual eStep and mStep buttons.
+
+```
+	http://sandbox.codelab.is/data/kmeans/
+```
+
 - [x] Initialize the prototypes. You can, for example, pick K random data points as your initial prototypes.
 - [x] Calculate a distance matrix whose elements contain the Euclidean distance from each datapoint to the prototypes.
 - [x] E-step: Compute the responsibilities from the distance matrix. (See Eq. 9.2 in Bishop).
@@ -10,10 +18,13 @@ Implementation of the k-means clustering class
 
 ## Objectives
 
-a) The function generateData() generates two following datasets and labels them:
-With 75 datapoints from the first cluster and 150 datapoints from the second one.
+#### a) Test your algorithm using K = 2 clusters on a dataset defined by:
 
 ![equation](https://i.gyazo.com/3f12b7c26daaf590bf552f33d3de5324.png)
+
+#### With 75 datapoints from the first cluster and 150 datapoints from the second one.
+
+The function generateData() generates the two following datasets and labels them:
 
 ```javascript
 generateData = () => {
@@ -43,9 +54,10 @@ The following image shows the dataset classified by the algorithm after 6 steps.
 
 The squares represent the prototypes and dots the data points.
 
-b) computeJ() is a class function for the kmeans algorithm.
-
+#### b) Compute J using the responsibilities and the distance matrix. Plot this for each iteration. How many iterations are appropriate? Can you design another stopping criterion?
 ![equation](https://i.gyazo.com/cfd466f29dfc07b89a73d6abafc1d12b.png)
+
+computeJ() is a class function for the kmeans algorithm.
 
 ```javascript
 computeJ() {
@@ -61,7 +73,8 @@ computeJ() {
 }
 ```
 
-c) 
+#### c) Use the final responsibilities to estimate the ratio of data points in
+each cluster
 
 ```javascript
 classRationing() {
@@ -74,9 +87,16 @@ classRationing() {
 }
 ```
 
-d) The iris dataset consists of three different species of which we want to classify. That means we want K = 3 in that particular case.
+#### d) Try this with K = 3, 4 and 5 clusters.
+#### e) Apply the K-means algorithm on Iris database. For what choice of K do the cluster labels correspond to the classes? In this case, compile the confusion matrix and calculate the misclassification rate.
+
+The iris dataset consists of three different species of which we want to classify. That means we want to start off with K = 3 classes.
+
+The image shows the classification after 8 steps in the algorithm. Once again, at a point where following steps did not make a difference.
 
 ![image](https://i.gyazo.com/70f975d760ddadb270a2a6c955179c21.png)
+
+The following confusion table shows the unnamed three classes on the left corresponding to the number of data points classified for each of the actual species. Where for example 48 versicolor datapoints where classified as class 2 (blue) while only 6 of them were classified as class 1 (red).
 
 ![image](https://i.gyazo.com/b614dc861731d216c497c39109b7150a.png)
 
