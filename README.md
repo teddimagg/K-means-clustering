@@ -16,6 +16,10 @@ http://sandbox.codelab.is/data/kmeans/
 - [x] M-step: Recompute the prototypes using Eq. 9.4 and the responsibilities calculated in the E-step.
 - [x] Repeat the previous three steps Niter times.
 
+In this implementation, the prototypes are given random location within the scale of the current dataset. This was added after troubles with the iris dataset, where most often one of the three prototypes would be outweight by the other's ending up "outside" the chart.
+
+The code can be found at the bottom.
+
 ## Objectives
 
 #### a) Test your algorithm using K = 2 clusters on a dataset defined by:
@@ -114,5 +118,213 @@ The following confusion table shows the unnamed three classes on the left corres
 
 
 
-## In addition
-The Old faithful dataset is also included.
+## The code
+### K class
+```javascript
+//K-means algorithm
+class K {
+	constructor(X, K, Niters) {
+		// Data includes data set x and the responsibility variable as well
+		this.data = X;	
+		
+		//Initialize the prototypes. K's are picked randomly
+		this.prototypes = []; //µ
+		let scale = dataScale(this.data);
+		for(let i = 0; i < K; i++){
+			this.prototypes[i] = {
+				x: random(scale.x.min, scale.x.max),
+				y: random(scale.y.min, scale.y.max)
+			}
+		}
+
+		// Training iterations
+		let iterations = setInterval(() => {
+			this.eStep();
+			this.mStep();
+			Niters--;
+			!Niters && clearInterval(iterations);
+		}, 400);
+	}
+
+	eStep() {
+		// Each data point is labelled according to it's closest prototype µ
+		this.data.forEach(point => {
+			let distances = [];
+			this.prototypes.forEach((proto, i) => {
+				distances[i] = {i: i, dist: dist(point.x, point.y, proto.x, proto.y)};
+			});
+			distances = distances.sort((a,b) => a.dist > b.dist);
+			point.label = (distances[0].i + 1).toString()
+		});
+	}
+
+	mStep() {
+		// Each prototype is assigned a new value from its class's mean (µ).
+		this.prototypes.forEach((proto, i) => {
+			this.prototypes[i] = mean(this.data.filter(point => (point.label == i + 1)));
+		});
+		console.log(this.computeJ());
+	}
+
+	computeJ() {
+		// J represents the sum of the squares of the distances of 
+		// each data point to its assigned vector µk.
+		let j = 0;
+		this.data.forEach(x => {
+			this.prototypes.forEach((mu, k) => {
+				(x.label == k) && (j += pow(dist(x.x, x.y, mu.x, mu.y), 2));
+			});
+		});
+		return j;
+	}
+
+	classRationing() {
+		// Calculates the ratio between all classes
+		let ratio = [];
+		this.data.forEach(point => {
+			(ratio[point.label] != undefined) ? ratio[point.label]++ : ratio[point.label] = 0;
+		});
+		return ratio.map(r => (r / data.length).toFixed(2) + '%');
+	}
+
+	missClassification(classlabel) {
+		// Generates a confusion table from the classification accuracy
+		// don't know the class names, go with the most frequent of each prototype.
+		
+		let misclass = [];
+		this.data.forEach(point => {
+			if(point[classlabel] == undefined) 
+				point[classlabel] = { correct: 0, missed: 0 };
+
+			if(point[classlabel] == point.label){
+				misclass[label].correct++;
+			} else {
+				misclass[label].missed++;
+			}
+		});
+	}
+}
+
+dataScale = data => ({
+	x: {
+		min: Math.min.apply(null, data.map(p => p.x)),
+		max: Math.max.apply(null, data.map(p => p.x))
+	},
+	y: {
+		min: Math.min.apply(null, data.map(p => p.y)),
+		max: Math.max.apply(null, data.map(p => p.y))
+	}
+});
+
+mean = points => ({ 
+	x: points.reduce((sum, value) => sum + value.x, 1) / points.length,
+	y: points.reduce((sum, value) => sum + value.y, 1) / points.length
+});
+```
+
+### UI tester
+```javascript
+let data = [];
+let kmeans;
+let scale;
+let j;
+
+function setup() {
+	// Init data clusters and kmeans algorithm
+	data = generateData();
+	kmeans = new K(data, 2, 3);
+	
+	// Visual attributes
+	rescale();
+
+	// Init visual DOM
+	createCanvas(600, 600);
+	const eBtn = createButton('eStep');
+	const mBtn = createButton('mStep');
+
+	eBtn.mousePressed(e => kmeans.eStep());
+	mBtn.mousePressed(e => kmeans.mStep());
+
+	// Dataset swapping
+	sel = createSelect();
+	sel.option('Gaussian data clusters');
+	sel.option('Old faithful');
+	sel.option('Iris Dataset');
+
+	sel.changed(() => {
+		if(sel.value() == 'Old faithful'){
+			data = oldFaithful;
+			kmeans = new K(data, 2, 3);
+		} else if(sel.value() == 'Iris Dataset'){
+			data = iris;
+			kmeans = new K(data, 3, 3);
+		} else {
+			data = generateData();
+			kmeans = new K(data, 2, 3);
+		}
+
+		rescale();
+	});
+}
+
+function draw() {
+	canvas.getContext('2d').transform(1, 0, 0, -1, 0, canvas.height);
+	background(200);
+	
+	fill('white');
+	kmeans.data.forEach(elem => {
+		if(elem.label)	
+			labelColor(elem.label)
+		ellipse(fitX(elem.x), fitY(elem.y), 8, 8);
+	});
+	
+	kmeans.prototypes.forEach((prototype, i) => {
+		labelColor(i+1);
+		rect(fitX(prototype.x), fitY(prototype.y), 8, 8);
+	});
+}
+
+// Visual helpers
+rescale = () => {
+	scale = dataScale(data);
+	scale.x.delta = Math.abs(scale.x.min - scale.x.max);
+	scale.y.delta = Math.abs(scale.y.min - scale.y.max);
+}
+
+fitX = x => ( map(x, scale.x.min - (0.2 * scale.x.delta), scale.x.max + (0.2 * scale.x.delta), 0, 600));
+fitY = y => ( map(y, scale.y.min - (0.2 * scale.y.delta), scale.y.max + (0.2 * scale.y.delta), 0, 600));
+
+labelColor = x => {
+	switch(Number(x)) {
+  		case 1:
+  			fill('red');
+  			break;
+  		case 2:
+  			fill('blue');
+  			break;
+  		case 3:
+  			fill('green');
+  			break;
+  	}
+}
+
+generateData = () => {
+	let data = [];
+	for(i = 0; i < 75; i++){
+	  	data[i] = {
+	  		x: randomGaussian(-1,1),
+	  		y: randomGaussian(1,1.1),
+	  		real: 'cluster1'
+	  	}
+  	}
+
+	for(i = 0; i < 150; i++){
+		data[75+i] = {
+			x: randomGaussian(1,0.3),
+			y: randomGaussian(-1,1),
+			real: 'cluster2'
+		}
+	}
+	return data;
+}
+```
