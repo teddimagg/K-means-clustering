@@ -11,7 +11,27 @@ Implementation of the k-means clustering class
 ## Objectives
 
 a) The function generateData() generates two following datasets and labels them:
+```javascript
+generateData = () => {
+	let data = [];
+	for(i = 0; i < 75; i++){
+	  	data[i] = {
+	  		x: randomGaussian(-1,1),
+	  		y: randomGaussian(1,1.1),
+	  		real: 'cluster1'
+	  	}
+  	}
 
+	for(i = 0; i < 150; i++){
+		data[75+i] = {
+			x: randomGaussian(1,0.3),
+			y: randomGaussian(-1,1),
+			real: 'cluster2'
+		}
+	}
+	return data;
+}
+```
 ![equation](https://i.gyazo.com/3f12b7c26daaf590bf552f33d3de5324.png)
 
 With 75 datapoints from the first cluster and 150 datapoints from the second one.
