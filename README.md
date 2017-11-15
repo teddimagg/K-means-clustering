@@ -7,7 +7,7 @@ The algorithm was implemented as a javascript class, class K(X, K, Niters). The 
 For demonstrational purposes the steps are intervaled on one second each step so that the progress can be seen live. The following link is to a live version of the whole project, with three datasets and manual eStep and mStep buttons.
 
 ```
-	http://sandbox.codelab.is/data/kmeans/
+http://sandbox.codelab.is/data/kmeans/
 ```
 
 - [x] Initialize the prototypes. You can, for example, pick K random data points as your initial prototypes.
@@ -52,10 +52,22 @@ The following image shows the dataset classified by the algorithm after 6 steps.
 
 ![image](https://i.gyazo.com/ae6ad362ed306eb4b0b957c058bb7fff.png)
 
-The squares represent the prototypes and dots the data points.
+The squares represent the prototypes, colors the current classification and dots the actual data points.
 
 #### b) Compute J using the responsibilities and the distance matrix. Plot this for each iteration. How many iterations are appropriate? Can you design another stopping criterion?
 ![equation](https://i.gyazo.com/cfd466f29dfc07b89a73d6abafc1d12b.png)
+
+While running the function computeJ() on every step these values for J came to be. After 7 steps the J stopped changing as the protypes and their datapoints have "gathered" closely enough so that the mean isn't changing in the e step.
+
+1. 2293.29
+2. 1811.95
+3. 1537.13
+4. 1537.13
+5. 1382.52
+6. 1293.94
+7. 1245.39
+
+A good stopping criterion would be that at the moment J does not change value inbetween iterations, the iterations would stop.
 
 computeJ() is a class function for the kmeans algorithm.
 
