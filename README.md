@@ -125,7 +125,7 @@ The following confusion table shows the unnamed three classes on the left corres
 
 ![image](https://i.gyazo.com/b614dc861731d216c497c39109b7150a.png)
 
-I manually assigned the unname classes to the correct actual label from the obvious majority for each case (marked green in the confusion table).
+I manually assigned the unnamed classes to the correct actual label from the obvious majority for each case (marked green in the confusion table).
 
 ## The code
 ### K class
